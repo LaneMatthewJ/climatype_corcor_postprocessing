@@ -15,7 +15,7 @@ def disconnect(client, workers_list):
 if __name__ == '__main__':
 
     sched_file = str(sys.argv[1]) #scheduler file
-    num_workers = int(sys.argv[2]) # number of workers to wait for
+    n = int(sys.argv[2]) # number of workers to wait for
     output_dir = str(sys.argv[3])
 
     # 1. Connects to the dask-cuda-cluster
@@ -33,11 +33,12 @@ if __name__ == '__main__':
 
     # 3. Do computation
     cudf_list = []
-    for file in tqdm(os.listdir(output_dir)):
-        if not os.path.isdir(f'{output_dir}/{file}') or file == "reformatted_network_values" or file == "unique_map" or file == "old_unique_map":
-            continue
-        
-        cudf_list.append( dask_cudf.read_csv(f'{output_dir}/{file}/unique/0.part', sep=',', header=None, dtype=['str']))
+for file in tqdm(os.listdir(output_dir)):
+    if 'top47' not in file:
+        continue 
+    if not os.path.isdir(f'{output_dir}/{file}') or file == "reformatted_network_values" or file == "unique_map" or file == "old_unique_map":
+        continue
+    cudf_list.append( dask_cudf.read_csv(f'{output_dir}/{file}/unique/0.part', sep=',', header=None, dtype=['str']))
 
     appended = dask_cudf.concat(cudf_list)
 

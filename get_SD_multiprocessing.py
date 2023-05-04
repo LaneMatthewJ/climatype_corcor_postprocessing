@@ -24,6 +24,8 @@ print("MAIN")
 sched_file = str(sys.argv[1]) #scheduler file
 num_workers = int(sys.argv[2]) # number of workers to wait for
 output_dir = str(sys.argv[3])
+total_unique_file = str(sys.argv[4])
+sparse_file_1958 = str(sys.argv[5])
 
 # 1. Connects to the dask-cuda-cluster
 #     client = Client(scheduler_file=sched_file)
@@ -39,7 +41,6 @@ output_dir = str(sys.argv[3])
 #     print(str(connected_workers) + " workers connected")
 fiftyk=pd.read_csv("/gpfs/alpine/syb105/proj-shared/Projects/Climatype/incite/global_mean/corcor//downsampled_cluster_coords_global_mean_dates01-1958_12-2019_t0.964_i2_n400_10rand_reformatted.txt", header=None, dtype=str)
 
-total_unique_file="/gpfs/alpine/syb105/proj-shared/Projects/Climatype/incite/global_yearly/comet_postpostprocessing_summit/reformatted_merged_combined_txts/unique_map/0.part"
 total_unique_cols = pd.read_csv(total_unique_file, header=None, dtype=str)
 
 mask = total_unique_cols[0].isin(fiftyk[0])
@@ -49,7 +50,7 @@ idx_list = list(total_unique_cols[mask].index)
 
 # 3. Do computation
 print("Reading 1958 network") 
-sparse_matrix_1958 = scipy.sparse.load_npz("/gpfs/alpine/syb105/proj-shared/Projects/Climatype/incite/global_yearly/comet_postpostprocessing_summit/reformatted_merged_combined_txts/reformatted_merged_combined_global_yearly_2w_1958_top47k/adjacency.npz")
+sparse_matrix_1958 = scipy.sparse.load_npz(sparse_file_1958)
 
 
 print("Reading reference net network") 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import dask
-import dask_cudf
+# import dask
+# import dask_cudf
 import dask.dataframe as dd
 import sys
 from dask.distributed import Client
@@ -20,7 +20,8 @@ def disconnect(client, workers_list):
 print("MAIN") 
 sched_file = str(sys.argv[1]) #scheduler file
 num_workers = int(sys.argv[2]) # number of workers to wait for
-output_dir = str(sys.argv[3])
+output_dir = str(sys.argv[3]) #3])
+total_unique_file = str(sys.argv[4])
 
 # 1. Connects to the dask-cuda-cluster
 #     client = Client(scheduler_file=sched_file)
@@ -36,20 +37,26 @@ output_dir = str(sys.argv[3])
 #     print(str(connected_workers) + " workers connected")
 
 # 3. Do computation
-df_list = []
+# df_list = []
 print('generating list') 
-for file in tqdm(os.listdir(output_dir)):
-    if os.path.isdir(f'{output_dir}/{file}') or '.npz' in file:
-        continue
-    df_list.append( pd.read_csv(f'{output_dir}/{file}', sep=',', header=None, dtype=str))
-
-appended = pd.concat(df_list)
+# for file in tqdm(os.listdir(output_dir)):
+#     try: 
+#         if os.path.isdir(f'{output_dir}/{file}') or '.npz' in file:
+#             continue
+#         df_list.append( pd.read_csv(f'{output_dir}/{file}', sep=',', header=None, dtype=str))
+#     except Exception as ex: 
+#         print("Exception during", file)
+#         print(ex)
+# appended = pd.concat(df_list)
+df = dd.read_csv(f'{output_dir}/*.part', header=None, dtype=str)
+print("computing list: ")
+appended = df.compute()
 
 print('reading unique columns') 
 unique_cols =  pd.read_csv(f'{output_dir}/unique/0.part', sep=',', header=None, dtype=str)
 
 print('reading unique_map')
-total_unique_file="/gpfs/alpine/syb105/proj-shared/Projects/Climatype/incite/global_yearly/comet_postpostprocessing_summit/reformatted_merged_combined_txts/unique_map/0.part"
+
 total_unique_cols = pd.read_csv(total_unique_file, header=None, dtype=str)
 
 print('extracting mask') 
@@ -67,3 +74,4 @@ sparse = nx.to_scipy_sparse_matrix(G, nodelist=total_unique_cols[0].values)
 
 print("Saving sparse matrix")
 scipy.sparse.save_npz(f'{output_dir}/adjacency.npz', sparse)
+print('done')

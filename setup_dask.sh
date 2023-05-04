@@ -4,14 +4,16 @@ module load ums
 module load ums-gen119
 module load nvidia-rapids
 
-SCHEDULER_DIR=/gpfs/alpine/syb105/proj-shared/Personal/lanemj/projects/climatypes/dask_neighbors/dask_scheduler
-WORKER_DIR=/gpfs/alpine/syb105/proj-shared/Personal/lanemj/projects/climatypes/dask_neighbors/worker_dir
+echo scheduler addendum is $1 
 
-SCHEDULER_FILE=$SCHEDULER_DIR/my-scheduler.json
+SCHEDULER_DIR=/gpfs/alpine/syb105/proj-shared/Personal/lanemj/projects/climatypes/dask_neighbors/dask_scheduler
+WORKER_DIR=/gpfs/alpine/syb105/proj-shared/Personal/lanemj/projects/climatypes/dask_neighbors/worker_dir/$1
+
+SCHEDULER_FILE=$SCHEDULER_DIR/my-scheduler$1.json
 
 echo 'Running scheduler'
 jsrun --nrs 1 --tasks_per_rs 1 --cpu_per_rs 2 --smpiargs="-disable_gpu_hooks" \
-      dask-scheduler --interface ib0 --scheduler-file $SCHEDULER_FILE \
+      dask-scheduler --interface ib0 --scheduler-file $SCHEDULER_FILE\
                      --no-dashboard --no-show &
 
 #Wait for the dask-scheduler to start

@@ -32,16 +32,20 @@ if __name__ == '__main__':
     print(str(connected_workers) + " workers connected")
 
     # 3. Do computation
-    cudf_list = []
-    for file in tqdm(os.listdir(output_dir)):
-        if os.path.isdir(f'{output_dir}/{file}'):
-            continue
-        cudf_list.append( dask_cudf.read_csv(f'{output_dir}/{file}', sep=',', header=None, dtype=['str','str'] ))
+    #cudf_list = []
+    #for file in tqdm(os.listdir(output_dir)):
+    #    if os.path.isdir(f'{output_dir}/{file}'):
+    #        continue
+    #    cudf_list.append( dask_cudf.read_csv(f'{output_dir}/{file}', sep=',', header=None, dtype=['str','str'] ))
 
-    appended = dask_cudf.concat(cudf_list)
+    
+    #appended = dask_cudf.concat(cudf_list)
 
-    unique_zero = appended['0'].unique()
-    unique_one = appended['1'].unique()
+    df = dd.read_csv(f"{output_dir}/*", header=None, dtype='str', blocksize="400MB")
+    appended= dask_cudf.from_dask_dataframe(df)
+
+    unique_zero = appended[0].unique()
+    unique_one = appended[1].unique()
 
     unique_both = dask_cudf.concat([unique_zero, unique_one]).unique()
 
