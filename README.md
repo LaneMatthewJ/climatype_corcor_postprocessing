@@ -1,5 +1,8 @@
 # climatype_corcor_postprocessing
 
+Given the nature of the climatype dataset, calculating the Sorensen Dice coefficient between each year and 1958 required usage of distributed methods. Dask is python framework that allows for simple and easy scaling. For each yearly range, we used dask data frames to read in all 2880 cor-cor output files as a singular dask dataframe object.  Cluster representatives and their immediate neighbors were then extracted and saved to files (done via the individual workers). Unique points were then extracted from each year and collated into a singular list of unique nodes to ensure similar sized matrices for Sorensen Dice calculations. Networks were then generated from the cluster representatives and their neighbors for each given year and then saved as adjacency matrices, from which Sorensen Dice coefficients were calculated for all years with respect to the starting year.
+
+
 ### 1. Finding All Neighbors Within the Given Year:
 #### Code
   - find_all_yearly_neighbors_multiprocess.py
